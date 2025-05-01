@@ -6,6 +6,7 @@ import { verifySessionToken } from "./middleware/verifySessionToken";
 import { RequestWithPayload } from "./type/RequestWithPayload";
 import { errorHandler } from "./middleware/errorHandler";
 import { logout } from "./handlers/auth";
+import { router as TodoTabRoute } from "./routes/todoTab";
 
 const app = express();
 
@@ -25,6 +26,8 @@ app.get("/api/me", (_, res) => {
   const req = _ as RequestWithPayload;
   res.json(req.session);
 });
+
+app.use("/api/todotab", TodoTabRoute);
 
 app.use(errorHandler);
 
