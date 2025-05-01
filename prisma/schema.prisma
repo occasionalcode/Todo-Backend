@@ -1,0 +1,65 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Status {
+  Ongoing
+  Finished
+  Trash
+  Delete
+}
+
+model Session {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  userId    String
+  expiresAt DateTime
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model User {
+  id        String    @id @default(uuid())
+  firstName String
+  lastName  String
+  email     String    @unique
+  password  String
+  TodoTab   TodoTab[]
+  sessions  Session[]
+}
+
+model TodoTab {
+  id     String @id @default(uuid())
+  title  String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String
+  todo   Todo[]
+}
+
+model Todo {
+  id        String   @id @default(uuid())
+  title     String
+  status    Status   @default(Ongoing)
+  tasks     Task[]
+  TodoTab   TodoTab? @relation(fields: [todoTabId], references: [id], onDelete: Cascade)
+  todoTabId String?
+}
+
+model Task {
+  id     String  @id @default(uuid())
+  name   String
+  status Status  @default(Ongoing)
+  Todo   Todo?   @relation(fields: [todoId], references: [id], onDelete: Cascade)
+  todoId String?
+}
